@@ -55,9 +55,10 @@ void compute_difference_table(void) {
 
   print_titre("THE ARRAY OF DIFFERENCES BETWEEN INPUTS AND OUTPUTS FROM THE CURRENT SBOX ");
 
-  init_difference_table(&tab_diff);
+  init_difference_table(tab_diff);
   print_newlines(8);
-  print_difference_table(&tab_diff);
+  print_difference_table(tab_diff);
+  get_stats(tab_diff);
   next();
   clear();
 
@@ -75,7 +76,7 @@ void print_differential_caracteristic(void) {
   for (unsigned int i = 0; i < NB_CARACTERISTICS; i++) {
     printf("0x%04x ", diff_carac[i].input_diff);
   }
-  #ifdef PATH_INFO
+#ifdef PATH_INFO
     printf("\nOutputs (round 1):");
     for (unsigned int i = 0; i < NB_CARACTERISTICS; i++) {
       printf("0x%04x ", diff_carac[i].output_diff_round_1);
@@ -96,7 +97,7 @@ void print_differential_caracteristic(void) {
     for (unsigned int i = 0; i < NB_CARACTERISTICS; i++) {
       printf("0x%04x ", diff_carac[i].output_diff_round_3);
     }
-  #endif
+#endif
   printf("\nInputs  (round 4):");
   for (unsigned int i = 0; i < NB_CARACTERISTICS; i++) {
     printf("0x%04x ", diff_carac[i].output_diff);
@@ -117,8 +118,11 @@ void compute_differential_caracteristic(void) {
   START_TIMER();
 
   print_titre("DIFFERENTIAL CARACTERISTIC COMPUTING");
-  diff_tab_to_diff_true_tab();
-  differential_caracteristic(diff_carac, heys_perm, diff_true_tab);
+  /* diff_tab_to_diff_true_tab(); */
+  /* differential_caracteristic(diff_carac, heys_perm, diff_true_tab); */
+
+  differential_caracteristic_2(diff_carac, heys_perm, tab_diff);
+
 #ifdef DEBUG
   system_call("evince atta* &");
 #endif
@@ -233,6 +237,8 @@ int main (int argc, char * argv []){
   print_titre_next(" DIFFERENTIAL CRYPTANALYSIS OF A HEYS'S FUNCTION : Preconditions ");
   print_requirements();
 
+  init_heys_arrays();
+  
   if (argc == 2) {
     char *inputs_file = argv[1];
     parse_inputs_file(inputs_file);

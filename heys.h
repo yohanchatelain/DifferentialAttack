@@ -49,6 +49,8 @@ void genere(int [5000][2], int, char*);
 block_t heys_decrypt_2(block_t, ckey_t);
 int heys_key_schedule_2(ckey_t k, skey_t sk);
 
+block_t get_heys_perm(block_t b);
+void init_heys_arrays();
 
 /*
 int  heys_encrypts(char *data, char *data, ckey_t);

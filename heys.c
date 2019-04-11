@@ -16,6 +16,11 @@ sbox_t isbox = {0xe, 0x3, 0x4, 0x8, 0x1, 0xc, 0xa, 0xf,
 		0x7, 0xd, 0x9, 0x6, 0xb, 0x2, 0x0, 0x5};
 
 
+block_t heys_perm_array[1<<16];
+block_t heys_subst_sbox_array[1<<16];
+block_t heys_subst_isbox_array[1<<16];
+
+
 inline block_t heys_perm(block_t b){
   block_t r;
   r = b & 0x8421;
@@ -28,6 +33,16 @@ inline block_t heys_perm(block_t b){
   return r;
 }
 
+void fill_heys_perm_array(void) {
+  for (block_t b = 0; b < (1<<16)-1; b++) {
+    heys_perm_array[b] = heys_perm(b);
+  }
+}
+
+inline block_t get_heys_perm(block_t b) {
+  return heys_perm_array[b];
+}
+
 inline block_t heys_subst(block_t b, sbox_t sbox){
   block_t r;
   r = sbox[b & 0x000f];
@@ -35,6 +50,18 @@ inline block_t heys_subst(block_t b, sbox_t sbox){
   r ^= sbox[(b & 0x0f00) >> 8] << 8;
   r ^= sbox[(b & 0xf000) >> 12] << 12;
   return r;
+}
+
+void fill_heys_subst_sbox_array(void) {
+  for (block_t b = 0; b < (1<<16)-1; b++) {
+    heys_subst_isbox_array[b] = heys_subst(b, sbox);
+  }
+}
+
+void fill_heys_subst_isbox_array(void) {
+  for (block_t b = 0; b < (1<<16)-1; b++) {
+    heys_subst_isbox_array[b] = heys_subst(b, isbox);
+  }
 }
 
 int heys_key_schedule(ckey_t k, skey_t sk){
@@ -163,16 +190,16 @@ block_t heys_encrypt_2(block_t b, ckey_t k){
 
   heys_key_schedule(k, sk);
   r = sk[0] ^ b;
-  r = heys_subst(r,sbox);
-  r = heys_perm(r);
+  r = heys_subst_sbox_array[r];
+  r = heys_perm_array[r];
   r ^= sk[1];
-  r = heys_subst(r,sbox);
-  r = heys_perm(r);
+  r = heys_subst_sbox_array[r];
+  r = heys_perm_array[r];
   r ^= sk[2];
-  r = heys_subst(r,sbox);
-  r = heys_perm(r);
+  r = heys_subst_sbox_array[r];
+  r = heys_perm_array[r];
   r ^= sk[3];
-  r = heys_subst(r,sbox);
+  r = heys_subst_sbox_array[r];
   r ^= sk[4];
 
   return r;
@@ -189,16 +216,16 @@ inline block_t heys_decrypt_2(block_t b, ckey_t k){
   heys_key_schedule_2(k, sk);
 
   r = sk[4] ^ b;
-  r = heys_subst(r,isbox);
+  r = heys_subst_isbox_array[r];
   r = sk[3] ^ r;
-  r = heys_perm(r);
-  r = heys_subst(r,isbox);
+  r = heys_perm_array[r];
+  r = heys_subst_isbox_array[r];
   r = sk[2] ^ r;
-  r = heys_perm(r);
-  r = heys_subst(r,isbox);
+  r = heys_perm_array[r];
+  r = heys_subst_isbox_array[r];
   r = sk[1] ^ r;
-  r = heys_perm(r);
-  r = heys_subst(r,isbox);
+  r = heys_perm_array[r];
+  r = heys_subst_isbox_array[r];
   r = sk[0] ^ r;
 
   /* insert_entry(b, k, r); */
@@ -226,6 +253,11 @@ void genere(int tab_rand[5000][2], int diff, char* nom_fichier ){
   fclose(f);
 }
 
+void init_heys_arrays(void) {
+  fill_heys_perm_array();
+  fill_heys_subst_sbox_array();
+  fill_heys_subst_isbox_array();
+}
 
 /* ckey_t determin_part(int tab_rand[5000][2], int diff){ */
 

@@ -86,7 +86,7 @@ void print_proceeding(int iterations, int sleep_duration) {
 }
 
 void clear(void) {
-#ifdef DEBUG
+#if defined(DEBUG) || defined(NO_CLEAR)
   return;
 #else
   system("clear");
