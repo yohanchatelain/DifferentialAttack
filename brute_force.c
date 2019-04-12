@@ -57,12 +57,6 @@ ckey_t bruteforce(ckey_t P_key)
   return -1;
 }
 
-
-inline ckey_t internal_bruteforce_2(ckey_t P_key, ckey_t j, block_t x, block_t y, block_t z,
-			     block_t x2, block_t y2, block_t z2) {
-  return 0;
-}
-
 ckey_t bruteforce_2(ckey_t P_key)
 {
   START_TIMER();
@@ -102,10 +96,7 @@ ckey_t bruteforce_2(ckey_t P_key)
   fprintf(stderr, "Encrypted:    x: %02hx  y: %02hx  z: %02hx\n",x,y,z);
   fprintf(stderr, "Random_file: x2: %02hx y2: %02hx z2: %02hx\n",x2,y2,z2);
 
-
-#ifndef DEBUG
 #pragma omp parallel for collapse(2), firstprivate(k), shared(result, found)
-#endif
   for(ckey_t j= 0ull ; j < twoTo28; j++) {
     for(ckey_t i= 0ull; i < twoTo4; i++) {
       k = P_key ^ (j<<12) ^ (i<<4);
@@ -136,6 +127,4 @@ ckey_t bruteforce_2(ckey_t P_key)
   }
 
   return result;
-  
-  return -1;
 }

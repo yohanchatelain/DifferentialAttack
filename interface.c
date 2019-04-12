@@ -53,12 +53,12 @@ void print_titre_next(char *g) {
 void print_sbox(sbox_t *sbox) {
   printf("Sbox : \n");
 
-  for (int i = 0; i <= sizeof(sbox_t); i++) {
+  for (unsigned int i = 0; i <= sizeof(sbox_t); i++) {
     printf("%x ",i);
   }
   printf("\n");
 
-  for (int i = 0; i <= sizeof(sbox_t); i++) {
+  for (unsigned int i = 0; i <= sizeof(sbox_t); i++) {
     printf("%x ",*sbox[i]);
   }
   printf("\n");

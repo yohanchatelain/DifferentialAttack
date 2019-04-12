@@ -96,8 +96,7 @@ void get_stats(difference_table_t diff_table) {
     count = counter_array[pos].count;
     value = counter_array[pos].value;
     float freq = count / ((float)size_tab_diff);
-    fprintf(stderr, "Frequency %02d = %02.3f\% (%d/%d)\n", value, 100*freq, count, size_tab_diff);
-    fprintf(stderr, "Frequency proba %02d = %02.3f\% (%d/%d)\n", value, 100*freq*freq*freq*freq, count, size_tab_diff);
+    fprintf(stderr, "Frequency %02d = %02.3f%% (%d/%d)\n", value, 100*freq, count, size_tab_diff);
     pos++;
   }
 }

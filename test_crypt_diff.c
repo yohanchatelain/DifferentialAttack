@@ -121,7 +121,7 @@ void compute_differential_caracteristic(void) {
   /* diff_tab_to_diff_true_tab(); */
   /* differential_caracteristic(diff_carac, heys_perm, diff_true_tab); */
 
-  differential_caracteristic_2(diff_carac, heys_perm, tab_diff);
+  differential_caracteristic_2(diff_carac, tab_diff);
 
 #ifdef DEBUG
   system_call("evince atta* &");
@@ -239,11 +239,7 @@ int main (int argc, char * argv []){
 
   init_heys_arrays();
   
-  if (argc == 2) {
-    char *inputs_file = argv[1];
-    parse_inputs_file(inputs_file);
-    enable_interactif_io = false;
-  } else if (argc == 4) {
+  if (argc == 4) {
     inputs = (inputs_t*)malloc(sizeof(inputs_t));
     inputs->cryptosystem = (char*)malloc(sizeof(char*));
     parse_inputs(argv);

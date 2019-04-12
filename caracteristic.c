@@ -91,14 +91,16 @@ void compute_medium_diff(difference_table_t difference_table, uint64_t *medium_t
     }
   }
 }
-
-inline uint64_t compute_proba(difference_table_t difference_table, block_t i, block_t j) {
+#ifndef DEBUG
+inline
+#endif
+uint64_t compute_proba(block_t i, block_t j) {
   return medium_table[(i & 0x00ff) * SBOX_SIZE*SBOX_SIZE + (j&0x00ff)]*
     medium_table[(i & 0xff00) + ((j&0xff00) >> 8)];
 }
 
 void
-differential_caracteristic_2(diff_carac_tab_t res, fct_perm f, difference_table_t difference_table) {
+differential_caracteristic_2(diff_carac_tab_t res, difference_table_t difference_table) {
   
   const byte_t max = previous_highest_value_difference_table_2(difference_table);
   const uint64_t proba_min_round = max*max*max*max;
@@ -106,15 +108,14 @@ differential_caracteristic_2(diff_carac_tab_t res, fct_perm f, difference_table_
   
   unsigned long long int proba;
 
-  block_t i,i2,j,j2,k,k2;
   uint64_t proba_i, proba_j, proba_k;
 
   compute_medium_diff(difference_table, medium_table);
   
-#pragma omp parallel for shared(proba), firstprivate(i,i2,j,j2,k,k2,proba_i,proba_j,proba_k)
+#pragma omp parallel for shared(proba)
   for (block_t i = 1; i < twoTo16Minus1; i++) {      	  
     for (block_t i2 = 1; i2 < twoTo16Minus1; i2++) {
-      proba_i = compute_proba(difference_table, i, i2);
+      proba_i = compute_proba(i, i2);
       if (proba_i == 0 || proba_i < proba_min_round) {
 	continue;
       }
@@ -122,7 +123,7 @@ differential_caracteristic_2(diff_carac_tab_t res, fct_perm f, difference_table_
       /* block_t j = f(i2); */
       block_t j = get_heys_perm(i2);
       for (block_t j2 = 1; j2 < twoTo16Minus1; j2++) {
-	proba_j = compute_proba(difference_table, j, j2);
+	proba_j = compute_proba(j, j2);
 
 	if (proba_j == 0 || proba_j < proba_min_round) {
 	  continue;
@@ -131,12 +132,12 @@ differential_caracteristic_2(diff_carac_tab_t res, fct_perm f, difference_table_
 	/* block_t k = f(j2); */
 	block_t k = get_heys_perm(j2);	
 	for (block_t k2 = 1; k2 < twoTo16Minus1; k2++) {
-	  proba_k = compute_proba(difference_table, k, k2);	  
+	  proba_k = compute_proba(k, k2);	  
 	  
 	  if (proba_k == 0 || proba_k < proba_min_round) {
 	    continue;
 	  }
-
+#pragma omp critical
 	  {	    
 	    proba = proba_i * proba_j * proba_k;
 	    if (proba > res[NB_CARACTERISTICS].proba) {

@@ -32,6 +32,6 @@ typedef struct {
 typedef differential_caracterictic_t diff_carac_tab_t[NB_CARACTERISTICS + 1];
 
 void differential_caracteristic(diff_carac_tab_t, fct_perm, byte_t[16][16]);
-void differential_caracteristic_2(diff_carac_tab_t res, fct_perm f, difference_table_t difference_table);
+void differential_caracteristic_2(diff_carac_tab_t res, difference_table_t difference_table);
 
 #endif /* CARACTERISTIQUE_H */
